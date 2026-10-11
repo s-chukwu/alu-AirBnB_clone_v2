@@ -1,1 +1,1 @@
-This directory implements webpage design.
+this is a Readme file for web static

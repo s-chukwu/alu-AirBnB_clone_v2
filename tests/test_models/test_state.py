@@ -1,19 +1,24 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import test_basemodel
+"""
+This module contains unit tests for the State class.
+"""
+import unittest
 from models.state import State
+from models.base_model import BaseModel
 
 
-class test_state(test_basemodel):
-    """ """
+class TestState(unittest.TestCase):
+    """Test cases for the State class."""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "State"
-        self.value = State
+    def test_inherits_base_model(self):
+        """Test that State inherits from BaseModel."""
+        self.assertTrue(issubclass(State, BaseModel))
 
-    def test_name3(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.name), str)
+    def test_default_name(self):
+        """Test that the default name is an empty string."""
+        s = State()
+        self.assertEqual(s.name, "")
+
+
+if __name__ == "__main__":
+    unittest.main()

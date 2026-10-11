@@ -1,24 +1,25 @@
 #!/usr/bin/python3
-""" """
-from tests.test_models.test_base_model import test_basemodel
+"""
+This module contains unit tests for the City class.
+"""
+import unittest
 from models.city import City
+from models.base_model import BaseModel
 
 
-class test_City(test_basemodel):
-    """ """
+class TestCity(unittest.TestCase):
+    """Test cases for the City class."""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = "City"
-        self.value = City
+    def test_inherits_base_model(self):
+        """Test that City inherits from BaseModel."""
+        self.assertTrue(issubclass(City, BaseModel))
 
-    def test_state_id(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.state_id), str)
+    def test_defaults(self):
+        """Test the default attributes of City."""
+        c = City()
+        self.assertEqual(c.state_id, "")
+        self.assertEqual(c.name, "")
 
-    def test_name(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.name), str)
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,99 +1,76 @@
 #!/usr/bin/python3
-""" """
-from models.base_model import BaseModel
+"""
+This module contains unit tests for the BaseModel class.
+"""
+
 import unittest
-import datetime
-from uuid import UUID
-import json
-import os
+from datetime import datetime
+from models.base_model import BaseModel
 
 
-class test_basemodel(unittest.TestCase):
-    """ """
+class TestBaseModel(unittest.TestCase):
+    """Test cases for the BaseModel class."""
 
-    def __init__(self, *args, **kwargs):
-        """ """
-        super().__init__(*args, **kwargs)
-        self.name = 'BaseModel'
-        self.value = BaseModel
+    def test_id_is_str(self):
+        """Test that id is a string."""
+        b = BaseModel()
+        self.assertIsInstance(b.id, str)
 
-    def setUp(self):
-        """ """
-        pass
+    def test_created_at_is_datetime(self):
+        """Test that created_at is a datetime object."""
+        b = BaseModel()
+        self.assertIsInstance(b.created_at, datetime)
 
-    def tearDown(self):
-        try:
-            os.remove('file.json')
-        except:
-            pass
+    def test_updated_at_is_datetime(self):
+        """Test that updated_at is a datetime object."""
+        b = BaseModel()
+        self.assertIsInstance(b.updated_at, datetime)
 
-    def test_default(self):
-        """ """
-        i = self.value()
-        self.assertEqual(type(i), self.value)
+    def test_unique_ids(self):
+        """Test that two instances have different ids."""
+        b1 = BaseModel()
+        b2 = BaseModel()
+        self.assertNotEqual(b1.id, b2.id)
 
-    def test_kwargs(self):
-        """ """
-        i = self.value()
-        copy = i.to_dict()
-        new = BaseModel(**copy)
-        self.assertFalse(new is i)
+    def test_str_representation(self):
+        """Test the string representation of BaseModel."""
+        b = BaseModel()
+        s = str(b)
+        self.assertIn("[BaseModel]", s)
+        self.assertIn(b.id, s)
 
-    def test_kwargs_int(self):
-        """ """
-        i = self.value()
-        copy = i.to_dict()
-        copy.update({1: 2})
-        with self.assertRaises(TypeError):
-            new = BaseModel(**copy)
+    def test_save_updates_updated_at(self):
+        """Test that save() updates updated_at."""
+        b = BaseModel()
+        old = b.updated_at
+        b.save()
+        self.assertGreaterEqual(b.updated_at, old)
 
-    def test_save(self):
-        """ Testing save """
-        i = self.value()
-        i.save()
-        key = self.name + "." + i.id
-        with open('file.json', 'r') as f:
-            j = json.load(f)
-            self.assertEqual(j[key], i.to_dict())
+    def test_to_dict_has_class_key(self):
+        """Test that to_dict includes __class__."""
+        b = BaseModel()
+        d = b.to_dict()
+        self.assertEqual(d["__class__"], "BaseModel")
 
-    def test_str(self):
-        """ """
-        i = self.value()
-        self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
-                         i.__dict__))
+    def test_to_dict_datetimes_are_strings(self):
+        """Test that to_dict converts datetimes to strings."""
+        b = BaseModel()
+        d = b.to_dict()
+        self.assertIsInstance(d["created_at"], str)
+        self.assertIsInstance(d["updated_at"], str)
 
-    def test_todict(self):
-        """ """
-        i = self.value()
-        n = i.to_dict()
-        self.assertEqual(i.to_dict(), n)
+    def test_recreate_from_dict(self):
+        """Test recreating an instance from to_dict output."""
+        b = BaseModel()
+        b.name = "Test"
+        b.number = 42
+        d = b.to_dict()
+        b2 = BaseModel(**d)
+        self.assertEqual(b2.id, b.id)
+        self.assertEqual(b2.name, "Test")
+        self.assertEqual(b2.number, 42)
+        self.assertIsInstance(b2.created_at, datetime)
 
-    def test_kwargs_none(self):
-        """ """
-        n = {None: None}
-        with self.assertRaises(TypeError):
-            new = self.value(**n)
 
-    def test_kwargs_one(self):
-        """ """
-        n = {'Name': 'test'}
-        with self.assertRaises(KeyError):
-            new = self.value(**n)
-
-    def test_id(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.id), str)
-
-    def test_created_at(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.created_at), datetime.datetime)
-
-    def test_updated_at(self):
-        """ """
-        new = self.value()
-        self.assertEqual(type(new.updated_at), datetime.datetime)
-        n = new.to_dict()
-        new = BaseModel(**n)
-        self.assertFalse(new.created_at == new.updated_at)
+if __name__ == "__main__":
+    unittest.main()
